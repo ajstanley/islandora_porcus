@@ -6,6 +6,23 @@
  *
  */
 
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_porcus_menu() {
+  return array(
+    'admin/islandora/porcus' => array(
+      'title' => 'Pig Latin Module',
+      'description' => 'Configure the Pig Latin solution pack.',
+      'page callback' => 'drupal_get_form',
+      'access arguments' => array('administer site configuration'),
+      'page arguments' => array('islandora_porcus_admin'),
+      'file' => 'includes/islandora_porcus.admin.inc',
+      'type' => MENU_NORMAL_ITEM,
+    ),
+  );
+}
 /**
  * Implements hook_theme().
  *
@@ -17,11 +34,6 @@ function islandora_porcus_theme($existing, $type, $theme, $path) {
   return array(
     'islandora_porcus' => array(
       'template' => 'theme/islandora-porcus',
-      // We can add PIDs to the end of this pattern in our preprocess function
-      // and templates will be able to have have a pid appended to the
-      // template name to overide a template on a per object basis.
-      // An example template might be named:
-      // "islandora-basic-image--islandora-27.tpl.php".
       'pattern' => 'islandora_porcus__',
       'variables' => array('islandora_object' => NULL),
     ),
