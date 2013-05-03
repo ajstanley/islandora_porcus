@@ -1,0 +1,5 @@
+name = Islandora Pig Latin 
+description = Converts boring plain text into exciting pig latin.
+package = Islandora
+version = "7.x-1.x-dev"
+core = "7.x"

@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Pig latin demo module.
+ *
+ */
+
+/**
+ * Implements hook_theme().
+ *
+ * We supply a pattern so we can overide templates at the theme level if needed.
+ * we can append a pid to a template and the new template file will be called
+ * (the pids colon should be replaced with a dash)
+ */
+function islandora_porcus_theme($existing, $type, $theme, $path) {
+  return array(
+    'islandora_porcus' => array(
+      'template' => 'theme/islandora-porcus',
+      // We can add PIDs to the end of this pattern in our preprocess function
+      // and templates will be able to have have a pid appended to the
+      // template name to overide a template on a per object basis.
+      // An example template might be named:
+      // "islandora-basic-image--islandora-27.tpl.php".
+      'pattern' => 'islandora_porcus__',
+      'variables' => array('islandora_object' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_theme().
+ * This is a Drupal hook, not supplied by islandora.
+ * Variables required for display are assembled here and passed to the template file
+ * defined in the theme function.  The function defines islandora-basic-image, which
+ * expands to islandora-basic-image.tpl.php
+ */
+function islandora_porcus_preprocess_islandora_porcus(array &$variables) {
+  $path = drupal_get_path('module', 'islandora_porcus');
+  drupal_add_css("$path/css/islandora_porcus.css");
+  drupal_add_js("$path/js/islandora_porcus.js");
+  $islandora_object = $variables['islandora_object'];
+  // Thumbnail.
+  if (isset($islandora_object['TN'])) {
+    $thumbnail_size_url = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
+    $params = array(
+      'title' => $islandora_object->label,
+      'path' => $thumbnail_size_url,
+    );
+    $variables['islandora_thumbnail_img'] = theme('image', $params);
+  }
+}
+
+/**
+ * Implements hook_CMODEL_PID_islandora_view_object().
+ * When an object'sbehavior id defined by the islandora_sp_basic_image content model
+ * this hook takes the object being displyed and sends it to the theme function described by islandora_basic_image_theme
+ */
+function islandora_porcus_islandora_porcusCModel_islandora_view_object($object, $page_number, $page_size) {
+  $output = theme('islandora_porcus', array('islandora_object' => $object));
+  return array('' => $output);
+}
+
+/**
+ * Implements hook_islandora_ingest_steps().
+ */
+function islandora_porcus_islandora_porcusCModel_islandora_ingest_steps(array $configuration) {
+  return array(
+    'islandora_porcus_file_upload' => array(
+      'weight' => 10,
+      'type' => 'form',
+      'form_id' => 'islandora_porcus_upload_form',
+      'module' => 'islandora_porcus',
+      'file' => 'includes/islandora_porcus_upload.form.inc'
+    )
+  );
+}
+
+/**
+ * Implements hook_CMODEL_PID_islandora_object_ingested().
+ */
+function islandora_porcus_islandora_porcusCModel_islandora_object_ingested($object) {
+  module_load_include('inc', 'islandora_porcus', 'includes/derivatives');
+  islandora_porcus_create_all_derivatives($object);
+}
+
+/**
+ * Implements hook_islandora_xml_form_builder_forms().
+ */
+function islandora_porcus_islandora_xml_form_builder_forms() {
+  $module_path = drupal_get_path('module', 'islandora_porcus');
+  return array(
+    'Porcus MODS form' => array(
+      'form_file' => "$module_path/xml/islandora_porcus_form_mods.xml",
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_content_model_forms_form_associations().
+ */
+function islandora_porcus_islandora_content_model_forms_form_associations() {
+  return array(
+    'islandora_porcus_mods_form' => array(
+      'content_model' => 'islandora:porcusCModel',
+      'form_name' => 'Porcus MODS form',
+      'dsid' => 'MODS',
+      'title_field' => array('titleInfo', 'title'),
+      'transform' => 'mods_to_dc.xsl',
+      'template' => FALSE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_required_objects().
+ */
+function islandora_porcus_islandora_required_objects(IslandoraTuque $connection) {
+  $islandora_porcus_content_model = $connection->repository->constructObject('islandora:porcusCModel');
+  $islandora_porcus_content_model->owner = 'fedoraAdmin';
+  $islandora_porcus_content_model->label = 'Islandora Pig Latin Model';
+  $islandora_porcus_content_model->models = 'fedora-system:ContentModel-3.0';
+
+  return array(
+    'islandora_porcus' => array(
+      'title' => 'Islandora Pig Latin',
+      'objects' => array(
+        $islandora_porcus_content_model,
+      ),
+    ),
+  );
+}

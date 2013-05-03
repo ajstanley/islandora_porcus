@@ -1,0 +1,12 @@
+
+root {
+  display: block;
+}
+
+.porcus_thumb {
+  float: left;
+  padding: 4%;
+}
+.islandora-porcus-content {
+  font-size: 120%;
+}

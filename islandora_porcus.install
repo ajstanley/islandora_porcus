@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ *
+ * Installs the required object for pig latin solution pack.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * @see islandora_islandora_required_objects()
+ */
+function islandora_porcus_install() {
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  islandora_install_solution_pack('islandora_porcus');
+}
+
+/**
+ * Implementation of hook_uninstall.
+ */
+function islandora_porcus_uninstall() {
+
+}
