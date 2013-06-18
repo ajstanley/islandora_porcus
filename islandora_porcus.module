@@ -9,6 +9,9 @@
 
 /**
  * Implements hook_menu().
+ * Drupal menus allow urls to be used as function calls, giving Drupal gets much
+ * if its power and flexibillty.
+ * See https://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_menu/7
  */
 function islandora_porcus_menu() {
   return array(
@@ -44,8 +47,12 @@ function islandora_porcus_theme($existing, $type, $theme, $path) {
  * Implements hook_preprocess_theme().
  * This is a Drupal hook, not supplied by islandora.
  * Variables required for display are assembled here and passed to the template file
- * defined in the theme function.  The function defines islandora-basic-image, which
- * expands to islandora-basic-image.tpl.php
+ * defined in the theme function.  The function defines islandora-porcus, which
+ * expands to islandora-porcus.tpl.php.
+ * The isandora object has been added to the $variables array by 
+ * hook_CMODEL_PID_islandora_view_object(), whihc in this case is
+ * islandora_porcus_islandora_porcusCModel_islandora_view_object
+ * 
  */
 function islandora_porcus_preprocess_islandora_porcus(array &$variables) {
   $path = drupal_get_path('module', 'islandora_porcus');
@@ -65,8 +72,10 @@ function islandora_porcus_preprocess_islandora_porcus(array &$variables) {
 
 /**
  * Implements hook_CMODEL_PID_islandora_view_object().
- * When an object'sbehavior id defined by the islandora_sp_basic_image content model
- * this hook takes the object being displyed and sends it to the theme function described by islandora_basic_image_theme
+ * If an object's behavior is defined by the islandora_porcus_islandora_porcusCModel content model
+ * this hook takes the object being displayed and sends it to the theme function described by islandora_porcus_theme.
+ * A reference to the islandora object being displayed is added here as a member of
+ * the array whihc makes the seond argument to the theme function.
  */
 function islandora_porcus_islandora_porcusCModel_islandora_view_object($object, $page_number, $page_size) {
   $output = theme('islandora_porcus', array('islandora_object' => $object));
@@ -75,6 +84,7 @@ function islandora_porcus_islandora_porcusCModel_islandora_view_object($object, 
 
 /**
  * Implements hook_islandora_ingest_steps().
+ * This hook adds a single ingest step, but more could be added as seperate entries.
  */
 function islandora_porcus_islandora_porcusCModel_islandora_ingest_steps(array $configuration) {
   return array(
@@ -90,6 +100,11 @@ function islandora_porcus_islandora_porcusCModel_islandora_ingest_steps(array $c
 
 /**
  * Implements hook_CMODEL_PID_islandora_object_ingested().
+ * This hook tells Islandora hat to do with the object once it has been ingested.
+ * In this case the raw text has been uploaded so we'll be in a position to 
+ * use that as input for our derived datastreams. The function
+ * islandora_porcus_create_all_derivatives will be called with a refrence to the 
+ * as yet uningested object. 
  */
 function islandora_porcus_islandora_porcusCModel_islandora_object_ingested($object) {
   module_load_include('inc', 'islandora_porcus', 'includes/derivatives');
@@ -98,6 +113,7 @@ function islandora_porcus_islandora_porcusCModel_islandora_object_ingested($obje
 
 /**
  * Implements hook_islandora_xml_form_builder_forms().
+ * This hook makes a predefined ingest form for ingest.
  */
 function islandora_porcus_islandora_xml_form_builder_forms() {
   $module_path = drupal_get_path('module', 'islandora_porcus');
@@ -110,6 +126,9 @@ function islandora_porcus_islandora_xml_form_builder_forms() {
 
 /**
  * Implements hook_islandora_content_model_forms_form_associations().
+ * This hook associated our form with our content model.  Any time we try to ingest
+ * an object with the islandora:porcusCModel content model, we will see this form
+ * allowing us to supply relevant metadata.
  */
 function islandora_porcus_islandora_content_model_forms_form_associations() {
   return array(
@@ -126,6 +145,8 @@ function islandora_porcus_islandora_content_model_forms_form_associations() {
 
 /**
  * Implements hook_islandora_required_objects().
+ * This hook ingests a very basic content model.  It is run when the module is
+ * first installed.
  */
 function islandora_porcus_islandora_required_objects(IslandoraTuque $connection) {
   $islandora_porcus_content_model = $connection->repository->constructObject('islandora:porcusCModel');

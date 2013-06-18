@@ -2,11 +2,19 @@
 
 /**
  * @file
- * Creates additonal datatreams for ingested object
+ * Creates additional datatreams for ingested object
  */
 
 /**
- * Creates all derivatives as datastreams for given object.
+ * Creates derivatives for object.
+ * 
+ * The islandora_porcus_islandora_porcusCModel_islandora_object_ingested hook
+ * calls this function. This function receives a copy of the uningested 
+ * islandora object and uses the OBJ datastream to create the derivative pig
+ * latin stream.
+ * 
+ * Each datastream is constructed, labeled, assigned a mimetype, and given 
+ * content, either from a string, or read in from a file location.
  *
  * @param FedoraObject $object
  *   The object that will be used to generate/store the derivatives.
@@ -31,7 +39,6 @@ function islandora_porcus_create_all_derivatives(FedoraObject $object) {
   $ds->setContentFromFile("$path/images/piggie.png");
   $object->ingestDatastream($ds);
   // Create and add pig latin datastream.
-  $object['OBJ']->getContent($file_uri);
   $pig_latin = islandora_porcus_transform_text($object['OBJ']->content);
   $ds = $object->constructDatastream('PORCUS', "M");
   $ds->label = 'Transformed Text';
@@ -55,22 +62,27 @@ function islandora_porcus_transform_text($input_text) {
   preg_match_all('/\b[^\s]+\b/', $input_text, $matches);
   $min_word_length = intval(variable_get('islandora_porcus_wordlength', '1'));
   $callback = function($word) use ($min_word_length) {
-    return strlen($word) >= $min_word_length;
-  };
-  $clean_words = array_filter($matches[0], $callback);
-  $clean_words = array_unique($clean_words);
+        return strlen($word) >= $min_word_length;
+      };
+  $dirty_words = array_filter($matches[0], $callback);
+  $clean_words = array_unique($dirty_words);
 
-  $vowels = array('a', 'e', 'i', 'o', 'u','A', 'E', 'I', 'O', 'U');
+  $vowels = array('a', 'e', 'i', 'o');
   foreach ($clean_words as $word) {
     $letters = str_split($word);
     $initial = array_shift($letters);
+    $isCapital = ctype_upper($initial);
+    $initial = strtolower($initial);
     if (in_array($initial, $vowels)) {
       $pig_word = $initial . implode('', $letters) . 'way';
     }
     else {
       $pig_word = implode('', $letters) . $initial . 'ay';
+      if($isCapital){
+        $pig_word = ucwords($pig_word);
+      }
     }
-    $input_text = preg_filter("/\b$word\b/", $pig_word, $input_text);
+    $input_text = preg_replace("/\b$word\b/", $pig_word, $input_text);
   }
   return $input_text;
 }
