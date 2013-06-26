@@ -8,6 +8,9 @@
  * function.  Elements such as labels and buttons can be added here
  */
 $islandora_content = $islandora_object['PORCUS']->content;
+$path = drupal_get_path('module', 'islandora_porcus');
+drupal_add_css("$path/css/islandora_porcus.css");
+drupal_add_js("$path/js/islandora_porcus.js");
 ?>
 
 <div class="islandora-porcus-object islandora">

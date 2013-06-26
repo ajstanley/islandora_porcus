@@ -1,6 +1,6 @@
 
 (function($) {
-  Drupal.behaviors.IslandoraFileview = {
+  Drupal.behaviors.IslandoraPorcus = {
     attach: function(context, settings) {
       $('#porcus_image').hide();
       $('.porcus_thumb').click(function() {

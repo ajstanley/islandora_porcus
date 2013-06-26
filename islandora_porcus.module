@@ -10,7 +10,7 @@
 /**
  * Implements hook_menu().
  * Drupal menus allow urls to be used as function calls, giving Drupal gets much
- * if its power and flexibillty.
+ * of its power and flexibillty.
  * See https://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_menu/7
  */
 function islandora_porcus_menu() {
@@ -55,9 +55,7 @@ function islandora_porcus_theme($existing, $type, $theme, $path) {
  * 
  */
 function islandora_porcus_preprocess_islandora_porcus(array &$variables) {
-  $path = drupal_get_path('module', 'islandora_porcus');
-  drupal_add_css("$path/css/islandora_porcus.css");
-  drupal_add_js("$path/js/islandora_porcus.js");
+
   $islandora_object = $variables['islandora_object'];
   // Thumbnail.
   if (isset($islandora_object['TN'])) {
@@ -100,7 +98,7 @@ function islandora_porcus_islandora_porcusCModel_islandora_ingest_steps(array $c
 
 /**
  * Implements hook_CMODEL_PID_islandora_object_ingested().
- * This hook tells Islandora hat to do with the object once it has been ingested.
+ * This hook tells Islandora what to do with the object once it has been ingested.
  * In this case the raw text has been uploaded so we'll be in a position to 
  * use that as input for our derived datastreams. The function
  * islandora_porcus_create_all_derivatives will be called with a refrence to the 
