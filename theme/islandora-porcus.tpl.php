@@ -3,7 +3,7 @@
  * @file
  * This is the template file for the porcus object page.
  *
- * Here we build an html page using the variables passed in by 
+ * Here we build an html page using the variables passed in by
  * the islandora_porcus_preprocess_islandora_porcus
  * function.  Elements such as labels and buttons can be added here
  */

@@ -7,7 +7,7 @@
 /**
  * Admin from.
  * @return array
- *  Returns admin form.
+ *   Returns admin form.
  */
 function islandora_porcus_admin() {
   $form = array();

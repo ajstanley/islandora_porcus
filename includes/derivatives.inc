@@ -7,13 +7,13 @@
 
 /**
  * Creates derivatives for object.
- * 
+ *
  * The islandora_porcus_islandora_porcusCModel_islandora_object_ingested hook
- * calls this function. This function receives a copy of the uningested 
+ * calls this function. This function receives a copy of the uningested
  * islandora object and uses the OBJ datastream to create the derivative pig
  * latin stream.
- * 
- * Each datastream is constructed, labeled, assigned a mimetype, and given 
+ *
+ * Each datastream is constructed, labeled, assigned a mimetype, and given
  * content, either from a string, or read in from a file location.
  *
  * @param FedoraObject $object
@@ -62,8 +62,8 @@ function islandora_porcus_transform_text($input_text) {
   preg_match_all('/\b[^\s]+\b/', $input_text, $matches);
   $min_word_length = intval(variable_get('islandora_porcus_wordlength', '1'));
   $callback = function($word) use ($min_word_length) {
-        return strlen($word) >= $min_word_length;
-      };
+    return strlen($word) >= $min_word_length;
+  };
   $dirty_words = array_filter($matches[0], $callback);
   $clean_words = array_unique($dirty_words);
 
@@ -71,14 +71,14 @@ function islandora_porcus_transform_text($input_text) {
   foreach ($clean_words as $word) {
     $letters = str_split($word);
     $initial = array_shift($letters);
-    $isCapital = ctype_upper($initial);
+    $is_capital = ctype_upper($initial);
     $initial = strtolower($initial);
     if (in_array($initial, $vowels)) {
       $pig_word = $initial . implode('', $letters) . 'way';
     }
     else {
       $pig_word = implode('', $letters) . $initial . 'ay';
-      if($isCapital){
+      if ($is_capital) {
         $pig_word = ucwords($pig_word);
       }
     }
